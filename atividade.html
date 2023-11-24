@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo de Adivinhação de Cores</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #mensagem {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #cores {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      max-width: 800px;
+    }
+
+    .cor {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="mensagem"></div>
+<div id="cores"></div>
+
+<script>
+  const coresHTML = ["red", "blue", "green", "yellow", "purple", "orange", "pink", "brown", "gray", "black", "white", "cyan", "magenta", "lime", "maroon", "olive", "navy", "teal", "silver", "gold", "indigo", "violet", "orchid", "salmon", "tomato", "peru", "rebeccapurple", "seagreen", "slateblue", "tan", "thistle", "turquoise", "wheat", "azure", "bisque", "coral", "cornflowerblue", "darkorange", "darkseagreen", "dodgerblue", "firebrick", "forestgreen", "goldenrod", "hotpink", "indianred", "khaki", "lightblue", "lightcoral", "lightgreen", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightsteelblue", "mediumorchid", "mediumseagreen", "mediumslateblue", "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "navajowhite", "oldlace", "orangered", "palegoldenrod", "palegreen", "paleturquoise", "palevioletred", "peachpuff", "powderblue", "rosybrown", "royalblue", "saddlebrown", "sandybrown", "seashell", "sienna", "skyblue", "slategray", "snow", "springgreen", "steelblue", "tan", "thistle", "tomato", "turquoise", "violet", "wheat", "white", "whitesmoke", "yellowgreen"];
+
+  let corEscolhidaPeloComputador;
+  let tentativas = 3;
+
+  document.getElementById("mensagem").innerText = "Adivinhe a cor!";
+  exibirCores(coresHTML);
+
+  // Função para exibir as cores na tela
+  function exibirCores(cores) {
+    const coresContainer = document.getElementById("cores");
+
+    coresContainer.innerHTML = "";
+    cores.forEach((cor) => {
+      const corElement = document.createElement("div");
+      corElement.className = "cor";
+      corElement.style.backgroundColor = cor;
+      corElement.addEventListener("click", () => tentarAdivinhar(cor));
+      coresContainer.appendChild(corElement);
+    });
+  }
+
+  function tentarAdivinhar(corInseridaPeloJogador) {
+    if (!corEscolhidaPeloComputador) {
+      // Seleciona uma cor aleatória apenas se ainda não foi escolhida
+      corEscolhidaPeloComputador = coresHTML[Math.floor(Math.random() * coresHTML.length)];
+    }
+
+    if (corInseridaPeloJogador === corEscolhidaPeloComputador) {
+      document.body.style.backgroundColor = corEscolhidaPeloComputador;
+      document.getElementById("mensagem").innerText = "Parabéns! Você venceu!";
+      desabilitarCliques();
+    } else {
+      tentativas--;
+
+      if (tentativas === 0) {
+        document.getElementById("mensagem").innerText = `Você perdeu! A cor era ${corEscolhidaPeloComputador}.`;
+        desabilitarCliques();
+      } else {
+        const dica = compararCores(corInseridaPeloJogador, corEscolhidaPeloComputador);
+        document.getElementById("mensagem").innerText = `Dica: ${dica}\nTentativas restantes: ${tentativas}`;
+      }
+    }
+  }
+
+  function compararCores(corInserida, corCorreta) {
+    const corInseridaLowerCase = corInserida.toLowerCase();
+    const corCorretaLowerCase = corCorreta.toLowerCase();
+
+    if (corInseridaLowerCase === corCorretaLowerCase) {
+      return "Você está muito próximo! A cor está correta.";
+    } else {
+      const similaridade = calcularSimilaridade(corInseridaLowerCase, corCorretaLowerCase);
+
+      if (similaridade > 0.5) {
+        return "Você está no caminho certo, mas a cor é um pouco diferente.";
+      } else {
+        return "Você está longe. Tente outra cor.";
+      }
+    }
+  }
+
+  function calcularSimilaridade(cor1, cor2) {
+    let contagemSimilaridade = 0;
+
+    for (let i = 0; i < cor1.length; i++) {
+      if (cor1[i] === cor2[i]) {
+        contagemSimilaridade++;
+      }
+    }
+
+    return contagemSimilaridade / cor1.length;
+  }
+
+  function desabilitarCliques() {
+    const coresElements = document.getElementsByClassName("cor");
+    Array.from(coresElements).forEach((element) => {
+      element.style.pointerEvents = "none";
+    });
+  }
+</script>
+
+</body>
+</html>
